@@ -3,21 +3,14 @@ Step 1: On Login script (prottek profile e alada validity)
 User Profiler Script option er On login e set korte hobe
 User profile 
 
-
-:local validity 7d;
+///////////////////-----------------------/////////////////////
 :local id [/ip hotspot user find where name=$user];
-:local c [/ip hotspot user get $id comment];
-:if ($c = "") do={
+:if ([/ip hotspot user get $id comment] = "") do={
   /ip hotspot user set $id comment=[:tostr [:timestamp]];
-} else={
-  :if (([:timestamp] - [:totime $c]) > $validity) do={
-    /ip hotspot user set $id disabled=yes;
-    /ip hotspot active remove [/ip hotspot active find where user=$user];
-    /ip hotspot cookie remove [/ip hotspot cookie find where user=$user];
-  }
 }
 
-Jodi poll er validity thake 30din tahole ei scrept er 7d er jaigai just 30din kore dite hobe
+
+///////////////////-----------------------/////////////////////
 
 
 
@@ -31,21 +24,19 @@ System  Schedule e Interval time jeta ami set korbo oi time por por ei Scrept de
 
  
 :foreach u in=[/ip hotspot user find where comment!="" disabled=no] do={
-  :local name [/ip hotspot user get $u name];
+  :local uname [/ip hotspot user get $u name];
   :local prof [/ip hotspot user get $u profile];
   :local c [/ip hotspot user get $u comment];
   :local v 0s;
-  :if ($prof="5Mbps-User") do={:set v 7d};
-  :if ($prof="20Mbps") do={:set v 30d};
-  :if ($prof="1Day") do={:set v 1d};
+  :if ($prof="Profile-7d") do={:set v 7d};
+  :if ($prof="Profile-30d") do={:set v 30d};
   :if ($v > 0s) do={
     :do {
       :if (([:timestamp] - [:totime $c]) > $v) do={
         /ip hotspot user set $u disabled=yes;
-        /ip hotspot active remove [/ip hotspot active find where user=$name];
-        /ip hotspot cookie remove [/ip hotspot cookie find where user=$name];
+        /ip hotspot active remove [/ip hotspot active find where user=$uname];
+        /ip hotspot cookie remove [/ip hotspot cookie find where user=$uname];
       }
     } on-error={}
   }
 }
-
