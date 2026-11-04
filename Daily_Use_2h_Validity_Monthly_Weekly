@@ -101,6 +101,10 @@ When the remaining validity reaches days:1, the next midnight marks the user
 as "expired", disables the account, and removes the active session and cookie.
 
 
+
+
+/////////////////-------------//////Update-Script-3//////////////////////
+
 /ip hotspot user reset-counters [find profile="Hotspot-2h"]
 /ip hotspot user reset-counters [find profile="Hotspot-5min"]
 /ip hotspot user reset-counters [find profile="Hotspot-30min"]
@@ -117,5 +121,7 @@ as "expired", disables the account, and removes the active session and cookie.
   }
 }
 
+
+/////////////////-------------////////////////////////////
 
 
