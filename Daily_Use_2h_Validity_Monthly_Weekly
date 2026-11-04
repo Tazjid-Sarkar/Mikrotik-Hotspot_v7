@@ -9,35 +9,33 @@ Step 0: Setup (ekbar)
 
 
 Script 1: On Login (duita profile e same script)
-[Mikrotik_CLI] /ip/hotspot/profile>
-
-
-Kothay: IP > Hotspot > User Profiles > Hotspot-2h > Scripts > On Login, abar Hotspot-5min > Scripts > On Login e-o same ta boshan.
-Kaj: Prothom login e comment e days:31 boshay (validity shuru). 31 dewar karon: prothom din ta adha thake, 
-tai prothom raat 12 tay days:30 hobe, r user pura 30 din pabe.
-
 ///////////////////---------------------/////////////////////
+[Mikrotik_CLI] /ip/hotspot/profile>Scripts  On Login: 
 
 :if ([/ip hotspot user get [find name=$user] comment] = "") do={
   /ip hotspot user set [find name=$user] comment="days:31"
 }
 
 ///////////////////---------------------/////////////////////
+Note: The reason for setting it to 31 days is that the first day is only
+a partial day.Therefore, at midnight on the first night, the validity will
+become days:30, ensuring that the user gets the full 30 days of validity.
+
+  
 
 
 
-Script 2: Scheduler check-daily-limit
 
-Kaj: Din e limit (2h ba 5min) hole user ke disable kore, session kete dey, cookie muche dey.
+Script 2: Scheduler check-daily-limit 
+///////////////////---------------------/////////////////////
 
-Kothay: System > Scheduler > Add
+[Mikrotik_CLI] System/Scheduler/Add
 
 Name: check-daily-limit
 Start Time: 00:00:00
-Interval: 00:00:30
+Interval: 00:01:00
 On Event:
 
-///////////////////---------------------/////////////////////
 
 :foreach i in=[/ip hotspot user find where disabled=no] do={
   :local p [/ip hotspot user get $i profile]
@@ -58,21 +56,24 @@ On Event:
   }
 }
 
-
 ///////////////////---------------------/////////////////////
 
+Note: When the daily usage limit (2 hours or 5 minutes) is reached,
+the system disables the user, terminates their active session, and
+deletes their cookie.
+
+
+
 Script 3: Scheduler daily-reset
+///////////////////---------------------/////////////////////
 
-Kaj: Protidin raat 12 tay: uptime counter 0, user enable, din 1 kom, 30 din sesh hole expired (abar enable hobe na).
-
-Kothay: System > Scheduler > Add
+[Mikrotik_CLI] System/Scheduler/Add
 
 Name: daily-reset
 Start Time: 00:00:00
 Interval: 1d 00:00:00
 On Event:
 
-///////////////////---------------------/////////////////////
 
 
 /ip hotspot user reset-counters [find profile="Hotspot-2h"]
@@ -92,5 +93,9 @@ On Event:
 
 
 ///////////////////---------------------/////////////////////
+
+Note: Every day at midnight (12:00 AM), the system resets the uptime counter to 0, 
+enables the user, and reduces the remaining validity by 1 day. Once the 30-day validity
+period expires, the user is marked as expired and will not be enabled again.
 
 
