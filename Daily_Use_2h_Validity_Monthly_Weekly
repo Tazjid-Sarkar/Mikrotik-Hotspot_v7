@@ -1,8 +1,5 @@
 
 Step 0: Setup (ekbar)
-
-Terminal e purono jinis muche timezone thik korun:
-
 /system clock set time-zone-name=Asia/Dhaka
 /system scheduler remove [find name~"check-"]
 /system scheduler remove [find name~"daily-"]
@@ -12,6 +9,9 @@ Terminal e purono jinis muche timezone thik korun:
 
 
 Script 1: On Login (duita profile e same script)
+[Mikrotik_CLI] /ip/hotspot/profile>
+
+
 Kothay: IP > Hotspot > User Profiles > Hotspot-2h > Scripts > On Login, abar Hotspot-5min > Scripts > On Login e-o same ta boshan.
 Kaj: Prothom login e comment e days:31 boshay (validity shuru). 31 dewar karon: prothom din ta adha thake, 
 tai prothom raat 12 tay days:30 hobe, r user pura 30 din pabe.
