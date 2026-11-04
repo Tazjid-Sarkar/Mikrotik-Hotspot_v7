@@ -93,9 +93,29 @@ On Event:
 
 
 ///////////////////---------------------/////////////////////
+Note: Every day at midnight (12:00 AM), the system:
+Resets the daily uptime counter to 0 for all Hotspot-2h and Hotspot-5min users.
+For users with a "days:N" comment, it reduces the remaining validity by 1 day
+and re-enables the user (so users disabled by the daily limit can log in again).
+When the remaining validity reaches days:1, the next midnight marks the user
+as "expired", disables the account, and removes the active session and cookie.
 
-Note: Every day at midnight (12:00 AM), the system resets the uptime counter to 0, 
-enables the user, and reduces the remaining validity by 1 day. Once the 30-day validity
-period expires, the user is marked as expired and will not be enabled again.
+
+/ip hotspot user reset-counters [find profile="Hotspot-2h"]
+/ip hotspot user reset-counters [find profile="Hotspot-5min"]
+/ip hotspot user reset-counters [find profile="Hotspot-30min"]
+:foreach i in=[/ip hotspot user find where comment~"^days:" (profile="Hotspot-2h" || profile="Hotspot-5min" || profile="Hotspot-30min")] do={
+  :local c [/ip hotspot user get $i comment]
+  :local d [:tonum [:pick $c 5 [:len $c]]]
+  :local n [/ip hotspot user get $i name]
+  :if ($d <= 1) do={
+    /ip hotspot user set $i disabled=yes comment="expired"
+    /ip hotspot active remove [find user=$n]
+    /ip hotspot cookie remove [find user=$n]
+  } else={
+    /ip hotspot user set $i disabled=no comment=("days:" . ($d - 1))
+  }
+}
+
 
 
